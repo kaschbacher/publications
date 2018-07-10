@@ -7,6 +7,10 @@
 *.png
 
 .ipynb_checkpoints/
+.DS_Store
 *.pyc
 
 fahy.py
+
+data/
+figures/
