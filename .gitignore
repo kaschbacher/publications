@@ -1,8 +1,12 @@
-*.csv
+*.ccv
 *.xls
 *.xlsx
+*.hdf5
 *.sav
 *.pdf
+*.png
 
 .ipynb_checkpoints/
 *.pyc
+
+fahy.py
