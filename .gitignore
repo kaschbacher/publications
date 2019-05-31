@@ -10,7 +10,5 @@
 .DS_Store
 *.pyc
 
-fahy.py
-
 data/
 figures/
