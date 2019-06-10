@@ -4,8 +4,8 @@
 
 -- https://stackoverflow.com/questions/19412462/getting-distance-between-two-points-based-on-latitude-longitude
 
-# approximate radius of earth in km
-# R = 6373.0
+-- approximate radius of earth in km
+-- R = 6373.0
 
 -- lat1 = radians(52.2296756)
 -- lon1 = radians(21.0122287)
@@ -36,8 +36,8 @@ CREATE TEMP TABLE radians (
 	dlon float8
 );
 
---INSERT INTO radians (lat1, lon1, lat2, lon2) VALUES (52.2296756, 21.0122287, 52.406374, 16.9251681);-- 278.545589351 km.
-INSERT INTO radians (lat1, lon1, lat2, lon2) VALUES (30.46847, -97.84808, 30.48621, -97.84254);-- 2.04343403613478
+INSERT INTO radians (lat1, lon1, lat2, lon2) VALUES (52.2296756, 21.0122287, 52.406374, 16.9251681);-- 278.545589351 km.
+-- INSERT INTO radians (lat1, lon1, lat2, lon2) VALUES (30.46847, -97.84808, 30.48621, -97.84254);-- 2.04343403613478
 
 UPDATE radians SET lat1 = RADIANS(lat1);
 UPDATE radians SET lon1 = RADIANS(lon1);
