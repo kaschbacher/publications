@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+  	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script src="https://code.highcharts.com/maps/highmaps.js"></script>
+	<script src="https://code.highcharts.com/maps/modules/data.js"></script>
+	<script src="https://code.highcharts.com/mapdata/countries/us/us-all.js"></script>
+
+  </head>
+
+  <body>
+  	<!-- Add a button -->
+<!-- 	<div class="button">
+	  <button onclick="get_mvdData()" class="bac">Motor Vehicle Death Rate</button>
+	  <div id="button" class="dropdown-content">
+	  </div>
+	</div> -->
+
+  	<div id="container" style="height: 650px; min-width: 610px; max-width: 900px; margin: 0"></div>
+
+
+  	<!-- Javascript Starts -->
+  	<script>
+
+  	// Load bac data (made using:  bac/motor_vehicle_deaths.ipynb)
+  	function get_bacData() {
+  		var myTitle = 'Mean BACtrack Blood Alcohol Level in 2014 by State'
+  		var myName = 'Mean BAC'//series name
+  		data = {"bac_avg":{"CA":0.072,"MA":0.074,"TX":0.069,"FL":0.073,"NY":0.081,"IL":0.068,"MO":0.06,"CO":0.054,"WA":0.08,"PA":0.088,"MI":0.064,"NV":0.1,"NJ":0.084,"MN":0.057,"NC":0.067,"AZ":0.081,"VA":0.083,"OH":0.056,"MD":0.073,"GA":0.063,"WI":0.082,"IN":0.087,"CT":0.067,"OR":0.077,"SC":0.08,"ME":0.06,"NH":0.086,"TN":0.083,"LA":0.094,"KY":0.058,"IA":0.067,"KS":0.084,"OK":0.1,"VT":0.075,"NE":0.079,"HI":0.067,"UT":0.043,"RI":0.081,"AL":0.102,"AK":0.064,"ID":0.092,"AR":0.059,"NM":0.074,"ND":0.072,"DE":0.04,"WV":0.128,"SD":0.081,"MS":0.07,"MT":0.141,"WY":0.053}}
+  		return [myTitle, myName, data]
+  	}
+
+  	// Load mvd data
+  	function get_mvdData() {
+  		myTitle = "Motor Vehicle Death Rate in 2014 by State"
+  		myName = "Death Rate"
+  		data = {"death_rate":{"CA":2.2,"MA":1.9,"TX":5.4,"FL":3.5,"NY":1.6,"IL":2.4,"MO":3.4,"CO":3.0,"WA":1.9,"PA":2.7,"MI":2.2,"NV":3.3,"NJ":1.8,"MN":1.9,"NC":3.8,"AZ":3.0,"VA":2.5,"OH":2.7,"MD":2.2,"GA":2.7,"WI":2.9,"IN":3.2,"CT":2.7,"OR":2.5,"SC":5.8,"ME":3.3,"NH":2.4,"TN":4.1,"LA":5.4,"KY":3.9,"IA":3.0,"KS":3.6,"OK":4.0,"VT":null,"NE":3.3,"HI":2.2,"UT":2.0,"RI":null,"AL":5.5,"AK":2.8,"ID":3.3,"AR":4.6,"NM":5.7,"ND":7.2,"DE":5.2,"WV":4.7,"SD":5.6,"MS":6.0,"MT":7.3,"WY":8.2}}
+  		return [myTitle, myName, data]
+  	}
+
+	//Reconfigure data in this format:  [0:{value: 438, code: "NJ"}, 1:{value: 387.35, code: "RI"}...]
+	function configure_data(state_data) {
+		//console.log(state_data)
+		var idx = 0;
+	  	var configured_data = []
+	  	Object.keys(state_data).forEach(function(key) {
+	    	//console.log(idx, key, state_data[key]);
+	    	configured_data.push({value:state_data[key], code:key})
+	    	idx++
+		});
+		return configured_data
+	 }
+
+	 // Load initial bac data
+	 [myTitle, myName, data] = get_bacData()
+	 configured_data = configure_data(data["bac_avg"])
+	 var click_count = 0// counter for clicking
+  	
+
+  	// Get state codes?
+  	$.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=us-population-density.json&callback=?', function (data) {
+    // Make codes uppercase to match the map data
+    $.each(data, function () {
+        this.code = this.code.toUpperCase();
+    });
+
+ 
+
+	// First define Options, then pass them to Container
+	var mapOptions = {
+
+	    chart: {
+	        type: 'map',
+	        events: {// listens for click, and changes data + name (for illustration purposes)
+	            click: function(e) {
+	                if (chartNof1) {
+	                	var new_title; var new_series_name; var new_data; var data_name;
+	                	click_count = click_count%2;
+
+	                	if (click_count==0) {
+	                		data_name = "death_rate";
+	                		[new_title, new_series_name, new_data] = get_mvdData();
+	                	}
+	                	else {
+	                		data_name = "bac_avg";
+	                		[new_title, new_series_name, new_data] = get_bacData();
+	                	}
+	                	//console.log('clicks:',click_count,'data_name:',data_name);
+	                	chartNof1.setTitle({text: new_title});
+	                	cfg_data = configure_data(new_data[data_name])
+	                	chartNof1.series[0].update({data: cfg_data, name: new_series_name});
+	                    chartNof1.redraw();
+	                    click_count++;
+	                }
+	            }
+	        } 
+	    }
+	}
+
+    // Instantiate the map
+    var chartNof1 = Highcharts.mapChart('container', Highcharts.merge(mapOptions, {
+
+        chart: {
+            borderWidth: 0
+        },
+
+        title: {
+            text: myTitle,
+            style: {fontSize: 24, wordWrap:'break-word'},
+        },
+
+        legend: {
+            layout: 'horizontal',
+            borderWidth: 0,
+            backgroundColor: 'rgba(255,255,255,0.85)',
+            floating: true,
+            verticalAlign: 'top',
+            y: 25
+        },
+
+        mapNavigation: {
+            enabled: true
+        },
+
+        colorAxis: {
+            min: 0,
+            type: 'logarithic',
+            // minColor: '#e5fcd1',
+            // maxColor: '#0b0191',
+            minColor: '#a3dde0',
+            maxColor: '#c40170'
+            // stops: [
+            //     [0.00, '#EFEFFF'],
+            //     [0.04, '#424291'],
+            //     [0.08, '#17174f']
+            // ]
+        },
+        series: [{
+            animation: {
+                duration: 1000
+            },
+            data: configured_data,
+            mapData: Highcharts.maps['countries/us/us-all'],
+            joinBy: ['postal-code', 'code'],
+            dataLabels: {
+                enabled: true,
+                align: "center",
+                color: '#FFFFFF',
+                style: {fontSize: 13},
+                format: '{point.code}',
+                shadow: {borderWidth:0}
+            },
+            name: myName,
+            tooltip: {
+                pointFormat: '<b>{point.code}</b>: {point.value}',
+                //style: {fontSize: 22}// doesn't work
+            }
+        }],
+        credits: false
+    }));
+});
+  	</script>
+  </body>
+</html>
+
+
+
+
+
+
+
+
